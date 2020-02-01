@@ -1,11 +1,7 @@
-const createBoardTemplate = () => {
+export const createBoardTemplate = () => {
   return (
-    `
-   <section class="board container">
+    `<section class="board container">
     <div class="board__tasks"></div>
-   </section>
-    `
+   </section>`
   );
 };
-
-export {createBoardTemplate};

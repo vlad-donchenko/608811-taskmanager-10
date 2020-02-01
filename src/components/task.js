@@ -1,7 +1,31 @@
-const createCardTemplate = () => {
+import {MonthNames} from '../const.js';
+import {formatTime} from '../utils.js';
+
+const createHashtagsMarkUp = (hashtag) => {
   return (
-    `
-     <article class="card card--black">
+    `<span class="card__hashtag-inner">
+        <span class="card__hashtag-name">
+            #${hashtag}
+        </span>
+    </span>`
+  );
+};
+
+export const createTaskTemplate = (task) => {
+  const {description, tags, color, dueDate, repeatingDays} = task;
+  const hashtagsMarkUp = Array.from(tags).map((it) => {
+    return createHashtagsMarkUp(it);
+  }).join(`\n`);
+
+  const isExpired = dueDate instanceof Date && dueDate < Date.now();
+  const isDateShowing = !!dueDate;
+  const deadlineClass = isExpired ? `card--deadline` : ``;
+  const repeatClass = Object.values(repeatingDays).some(Boolean) ? `card--repeat` : ``;
+  const date = isDateShowing ? `${dueDate.getDate()} ${MonthNames[dueDate.getMonth()]}` : ``;
+  const time = isDateShowing ? formatTime(dueDate) : ``;
+
+  return (
+    `<article class="card card--${color} ${deadlineClass} ${repeatClass}">
         <div class="card__form">
            <div class="card__inner">
                 <div class="card__control">
@@ -23,7 +47,7 @@ const createCardTemplate = () => {
                 </div>
 
                 <div class="card__textarea-wrap">
-                  <p class="card__text">Example default task with default color.</p>
+                  <p class="card__text">${description}</p>
                 </div>
 
                 <div class="card__settings">
@@ -31,40 +55,21 @@ const createCardTemplate = () => {
                     <div class="card__dates">
                       <div class="card__date-deadline">
                         <p class="card__input-deadline-wrap">
-                          <span class="card__date">23 September</span>
-                          <span class="card__time">11:15 PM</span>
+                          <span class="card__date">${date}</span>
+                          <span class="card__time">${time}</span>
                         </p>
                       </div>
                     </div>
 
                     <div class="card__hashtag">
                       <div class="card__hashtag-list">
-                        <span class="card__hashtag-inner">
-                          <span class="card__hashtag-name">
-                            #todo
-                          </span>
-                        </span>
-
-                        <span class="card__hashtag-inner">
-                          <span class="card__hashtag-name">
-                            #personal
-                          </span>
-                        </span>
-
-                        <span class="card__hashtag-inner">
-                          <span class="card__hashtag-name">
-                            #important
-                          </span>
-                        </span>
+                        ${hashtagsMarkUp}
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
           </div>
-      </article>
-    `
+      </article>`
   );
 };
-
-export {createCardTemplate};
