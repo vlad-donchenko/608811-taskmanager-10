@@ -1,4 +1,6 @@
-export const createMenuTemplate = () => {
+import {createElement} from "../utils";
+
+const createMenuTemplate = () => {
   return (
     `<section class="control__btn-wrap">
        <input type="radio" name="control" id="control__new-task" class="control__input visually-hidden">
@@ -10,3 +12,25 @@ export const createMenuTemplate = () => {
      </section>`
   );
 };
+
+export default class SiteMenu {
+  constructor() {
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createMenuTemplate();
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
