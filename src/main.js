@@ -7,7 +7,7 @@ import SiteMenuComponent from "./components/site-menu";
 import SortComponent from "./components/sorting";
 import TasksComponent from "./components/tasks";
 import NoTasksComponent from "./components/no-tasks";
-import {render, RenderPosition} from "./utils";
+import {render, replace, remove, RenderPosition} from "./utils/render";
 import {getFilters} from "./mock/filter";
 import {getTasks} from "./mock/task";
 
@@ -17,11 +17,11 @@ const SHOWING_TASKS_COUNT_BY_BUTTON = 8;
 
 const renderTask = (taskListElement, task) => {
   const replaceEditToTask = () => {
-    taskListElement.replaceChild(taskComponent.getElement(), taskEditComponent.getElement());
+    replace(taskComponent, taskEditComponent);
   };
 
   const replaceTaskToEdit = () => {
-    taskListElement.replaceChild(taskEditComponent.getElement(), taskComponent.getElement());
+    replace(taskEditComponent, taskComponent);
   };
 
   const escKeyPressHandler = (evt) => {
@@ -34,41 +34,38 @@ const renderTask = (taskListElement, task) => {
   };
 
   const taskComponent = new TaskComponent(task);
-  const editButton = taskComponent.getElement().querySelector(`.card__btn--edit`);
-
-  editButton.addEventListener(`click`, () => {
+  taskComponent.setEditButtonClickHandler(() => {
     replaceTaskToEdit();
     document.addEventListener(`keydown`, escKeyPressHandler);
   });
 
   const taskEditComponent = new TaskEditComponent(task);
-  const editForm = taskEditComponent.getElement().querySelector(`form`);
-  editForm.addEventListener(`submit`, replaceTaskToEdit);
+  taskEditComponent.setSubmitHandler(replaceTaskToEdit);
 
-  render(taskListElement, taskComponent.getElement(), RenderPosition.BEFOREEND);
+  render(taskListElement, taskComponent, RenderPosition.BEFOREEND);
 };
 
 const siteMainElement = document.querySelector(`.main`);
 const siteHeaderElement = siteMainElement.querySelector(`.main__control`);
 
 const siteMenuComponent = new SiteMenuComponent();
-render(siteHeaderElement, siteMenuComponent.getElement(), RenderPosition.BEFOREEND);
+render(siteHeaderElement, siteMenuComponent, RenderPosition.BEFOREEND);
 
 const filters = getFilters();
 const filterComponent = new FilterComponent(filters);
-render(siteMainElement, filterComponent.getElement(), RenderPosition.BEFOREEND);
+render(siteMainElement, filterComponent, RenderPosition.BEFOREEND);
 
 const boardComponent = new BoardComponent();
-render(siteMainElement, boardComponent.getElement(), RenderPosition.BEFOREEND);
+render(siteMainElement, boardComponent, RenderPosition.BEFOREEND);
 
 const tasks = getTasks(TASK_COUNT);
 const isAllTasksArchived = tasks.every((task) => task.isArchive);
 
 if (isAllTasksArchived) {
-  render(boardComponent.getElement(), new NoTasksComponent().getElement(), RenderPosition.BEFOREEND);
+  render(boardComponent.getElement(), new NoTasksComponent(), RenderPosition.BEFOREEND);
 } else {
-  render(boardComponent.getElement(), new SortComponent().getElement(), RenderPosition.BEFOREEND);
-  render(boardComponent.getElement(), new TasksComponent().getElement(), RenderPosition.BEFOREEND);
+  render(boardComponent.getElement(), new SortComponent(), RenderPosition.BEFOREEND);
+  render(boardComponent.getElement(), new TasksComponent(), RenderPosition.BEFOREEND);
 }
 
 const taskListElement = boardComponent.getElement().querySelector(`.board__tasks`);
@@ -79,9 +76,9 @@ tasks.slice(0, showingTasksCount).forEach((it) => {
 });
 
 const loadMoreButtonComponent = new LoadMoreButtonComponent();
-render(boardComponent.getElement(), loadMoreButtonComponent.getElement(), RenderPosition.BEFOREEND);
+render(boardComponent.getElement(), loadMoreButtonComponent, RenderPosition.BEFOREEND);
 
-loadMoreButtonComponent.getElement().addEventListener(`click`, () => {
+loadMoreButtonComponent.setClickHandler(() => {
   const prevTaskCount = showingTasksCount;
   showingTasksCount = showingTasksCount + SHOWING_TASKS_COUNT_BY_BUTTON;
 
@@ -90,7 +87,6 @@ loadMoreButtonComponent.getElement().addEventListener(`click`, () => {
   });
 
   if (showingTasksCount >= tasks.length) {
-    loadMoreButtonComponent.getElement().remove();
-    loadMoreButtonComponent.removeElement();
+    remove(loadMoreButtonComponent);
   }
 });

@@ -1,5 +1,6 @@
 import {COLORS, DAYS, MONTH_NAMES} from '../const.js';
-import {formatTime, createElement} from '../utils.js';
+import {formatTime} from '../utils/common';
+import AbstractComponent from "./abstract-component";
 
 const createHashtagsMarkUp = (hashtag) => {
   return (
@@ -124,9 +125,9 @@ const createTaskEditTemplate = (task) => {
   );
 };
 
-export default class TaskEdit {
+export default class TaskEdit extends AbstractComponent {
   constructor(task) {
-    this._element = null;
+    super();
     this._task = task;
   }
 
@@ -134,14 +135,7 @@ export default class TaskEdit {
     return createTaskEditTemplate(this._task);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
+  setSubmitHandler(handler) {
+    this.getElement().querySelector(`form`).addEventListener(`submit`, handler);
   }
 }
